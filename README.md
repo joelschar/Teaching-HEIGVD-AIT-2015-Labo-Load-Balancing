@@ -149,7 +149,7 @@ Now it's time to play a bit with what we did until now.
 
 Open JMeter and then open the script `tester.jmx` present in the root
 folder of the project and follow the instructions given in the
-following screenshot:
+following screenshot (Click on the image and then on RAW button to see the picture in full size. Usefull to read the text):
 
 ![JMeter](assets/img/jmeter.png)
 
