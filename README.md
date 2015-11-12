@@ -480,3 +480,39 @@ concurrent users.
 #### Lab due date
 
 Deliver your results at the latest 15 minutes before class Wednesday, November 25.
+
+#### Windows troubleshooting
+
+It appears that Windows users can encounter a `CRLF` vs. `LF` problem when the repos is cloned without taking care of the ending lines. Therefore, if the ending lines are `CRFL`, it will produce an error message with Docker during the Vagrant provisioning phase:
+
+```bash
+... no such file or directory
+```
+
+(Take a look to this Docker issue: https://github.com/docker/docker/issues/9066, the last post show the error message).
+
+The error message is not really relevant and difficult to troubleshoot. It seems the problem is caused by the line endings not correctly interpreted by Linux when they are `CRLF` in place of `LF`. The problem is caused by cloning the repos on Windows with a system that will not keep the `LF` in the files.
+
+Fortunatelly, there is a procedure to fix the `CRLF` to `LF` and then be sure Docker will recognize the `*.sh` files.
+
+First, you need to add the file `.gitattributes` file with the following content:
+
+```bash
+* text eol=lf
+```
+
+This will ask the repos to force the ending lines to `LF` for every text files.
+
+Then, you need to reset your repository. Be sure you do not have **modified** files.
+
+```bash
+# Erease all the files in your local repository
+git rm --cached -r .
+
+# Restore the files from your local repository and apply the correct ending lines (LF)
+git reset --hard
+```
+
+Then, you are ready to go. You can provision your Vagrant VM again and start to work pacefully.
+
+There is a link to deeper explanation and procedure about the ending lines writtent by GitHub: https://help.github.com/articles/dealing-with-line-endings/
