@@ -234,7 +234,8 @@ useful commands and hints.
 * Clear the results in JMeter.
 
 * Now, update the JMeter script. Go in the HTTP Cookie Manager and
-  uncheck the box `Clear cookies each iteration?`
+  <del>uncheck</del><ins>verify that</ins> the box `Clear cookies each iteration?`
+  <ins>is unchecked</ins>.
 
 * Provide a screenshot of JMeter's summary report. This time, is there
   a difference with this run and the run of Task 1?
