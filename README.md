@@ -17,6 +17,8 @@ progress in a lab report. Each task specifies one or more deliverables
 to be produced.  Collect all the deliverables in your lab report. Give
 the lab report a structure that mimics the structure of this document.
 
+**Remark**: Use the Task numbers and question numbers in reference in your report.
+
 ### Task 1: Install the tools
 
 In this part you will install the base tools you need to do the
@@ -171,15 +173,15 @@ The JMeter test plan is set up in the following way:
 
 **Deliverables:**
 
-* Explain how the load balancer behaves when you open and refresh the
+1. Explain how the load balancer behaves when you open and refresh the
   URL <http://192.168.42.42> in your browser. Add screenshots to
   complement your explanations. We expect that you take a deeper a
   look at session management.
   
-* Explain what should be the correct behavior of the load balancer for
+2. Explain what should be the correct behavior of the load balancer for
   session management.
 
-* Provide a sequence diagram to explain what is happening when one
+3. Provide a sequence diagram to explain what is happening when one
   requests the URL for the first time and then refreshes the page. We
   want to see what is happening with the cookie. We want to see the
   sequence of messages exchanged (1) between the browser and HAProxy
@@ -187,9 +189,9 @@ The JMeter test plan is set up in the following way:
   
   ![Sequence diagram for part 1](assets/img/seq-diag-1.png)
 
-* Provide a screenshot of the summary report from JMeter.
+4. Provide a screenshot of the summary report from JMeter.
 
-* In the Vagrant VM, run the following command:
+5. In the Vagrant VM, run the following command:
 
   ```bash
   $ docker stop s1
@@ -213,37 +215,41 @@ useful commands and hints.
 
 **Deliverables:**
 
-* Provide the modified `haproxy.cfg` file with a short explanation of
+1. There is different way to implement the sticky session. One possibility is to use the SERVERID provided by HAProxy. Another way is to use the NODESESSID provided by the application. Briefly explain the difference between both approaches (provide a sequence diagram with cookies to show the difference).
+
+  * Choose one of the both stickiness approach for the next tasks.
+
+2. Provide the modified `haproxy.cfg` file with a short explanation of
   the modifications you did to enable sticky session management.
 
-* Explain what is the behavior when you open and refresh the URL
+3. Explain what is the behavior when you open and refresh the URL
   <http://192.168.42.42> in your browser. Add screenshots to
   complement your explanations. We expect that you take a deeper a
   look at session management.
   
-* Provide a sequence diagram to explain what is happening when one
+4. Provide a sequence diagram to explain what is happening when one
   requests the URL for the first time and then refreshes the page. We
   want to see what is happening with the cookie. We want to see the
   sequence of messages exchanged (1) between the browser and HAProxy
   and (2) between HAProxy and the nodes S1 and S2. We also want to see
   what is happening when a second browser is used.
 
-* Provide a screenshot of JMeter's summary report. Is there a
+5. Provide a screenshot of JMeter's summary report. Is there a
   difference with this run and the run of Task 1?
 
-* Clear the results in JMeter.
+  * Clear the results in JMeter.
 
-* Now, update the JMeter script. Go in the HTTP Cookie Manager and
+  * Now, update the JMeter script. Go in the HTTP Cookie Manager and
   <del>uncheck</del><ins>verify that</ins> the box `Clear cookies each iteration?`
   <ins>is unchecked</ins>.
 
-* Provide a screenshot of JMeter's summary report. This time, is there
+6. Provide a screenshot of JMeter's summary report. This time, is there
   a difference with this run and the run of Task 1?
 
-* Once again, update the JMeter script. Go in `Thread Group` and
+  * Once again, update the JMeter script. Go in `Thread Group` and
   update the `Number of threads`. Set the value to 2.
 
-* Provide a screenshot of JMeter's summary report. Give a short
+7. Provide a screenshot of JMeter's summary report. Give a short
   explanation of what the load balancer is doing.
 
 
