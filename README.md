@@ -437,10 +437,9 @@ concurrent users.
 
 5. Update the HAProxy configuration to add a weight to your nodes. For
   that, add `weight [1-256]` where the value of weight is between the
-  two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo the three
-  first steps.
+  two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo a run with 250ms delay.
 
-6. Now, redo all the 5 previous questions with the cookies cleared between two requests. You do not need to provide screenshots or deep explanations. We expect just one or two setence to summarize your observations of the behavior with/without cookies and the 0/250/2500 ms delays.
+6. Now, what happened when the cookies are cleared between each requests and the delay is set to 250ms ? We expect just one or two setence to summarize your observations of the behavior with/without cookies.
 
 ### Task 5: Balancing strategies
 
