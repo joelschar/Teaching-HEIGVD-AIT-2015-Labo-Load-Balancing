@@ -356,43 +356,38 @@ admin stats interface (or also found in the config file).
 
 **Deliverables:**
 
-* Take a screenshot of the Step 5 and tell us which node is answering.
+1. Take a screenshot of the Step 5 and tell us which node is answering.
 
-* Based on your previous answer, set the node in DRAIN mode. Take a
+2. Based on your previous answer, set the node in DRAIN mode. Take a
   screenshot of the HAProxy state page.
 
-* Refresh your browser and explain what is happening. Tell us if you
+3. Refresh your browser and explain what is happening. Tell us if you
   stay on the same node or not. If yes, why? If no, why?
 
-* Open another browser and open `http://192.168.42.42`. What is
+4. Open another browser and open `http://192.168.42.42`. What is
   happening?
 
-* Clear the cookies on the new browser and repeat these two steps
+5. Clear the cookies on the new browser and repeat these two steps
   multiple times. What is happening? Are you reaching the node in
   DRAIN mode?
 
-* Reset the node in READY mode. Repeat the three previous steps and
+6. Reset the node in READY mode. Repeat the three previous steps and
   explain what is happening. Provide a screenshot of HAProxy's stats
   page.
 
-* Finally, set the node in MAINT mode. Redo the three same steps and
+7. Finally, set the node in MAINT mode. Redo the three same steps and
   explain what is happening. Provide a screenshot of HAProxy's stats
   page.
 
+### Task 4: Round robin in degraded mode.
 
-### Task 4: Balancing strategies
+In this part, we will try to simulate a degraded mode based on the round-robin previously configured.
 
-In this part of the lab you will discover the different strategies of
-HAProxy to load balance the traffic between the nodes.
-
-You can discover the different strategies in
-[HAProxy documentation](http://cbonte.github.io/haproxy-dconv/configuration-1.6.html#balance)
-
-To help viewing the difference between strategies, the web application
+To help expermimenting the balancing when an application started to behave strangely, the web application
 has a REST resource to configure a delay in the response. You can set
 an arbitrary delay in milliseconds. Once the delay is configured, the
 response will take the amount of time configured.
- 
+
 To set the timeout, you have to do a `POST` request with the following
 content (be sure the `Content-Type` header is set to
 `application/json`. The configuration is applicable on each
@@ -426,57 +421,40 @@ concurrent users.
 
 *Remark*: In general, take a screenshot of the summary report in
  JMeter to explain what is happening.
-
+ 
 **Deliverables:**
 
-* Based on the previous step, run the JMeter script to have the base
-  data set to compare with the other strategies. Take a screenshot of
-  the summary report.
+*Remark*: Make sur you have the cookies are kept between two requests.
 
-* Set a delay of 2500 milliseconds on `s1`. Relaunch a run with the
+1. Be sure the delay is of 0 milliseconds is set on `s1`. Do a run to have base data to compare with the next experiments.
+
+2. Set a delay of 250 milliseconds on `s1`. Relaunch a run with the
   JMeter script and explain what it is happening?
 
-* Set a delay of 250 milliseconds on `s1`. Same than previous step.
+3. Set a delay of 2500 milliseconds on `s1`. Same than previous step.
 
-* In the two previous steps, are there any error? Why?
+4. In the two previous steps, are there any error? Why?
 
-* Update the HAProxy configuration to add a weight to your nodes. For
+5. Update the HAProxy configuration to add a weight to your nodes. For
   that, add `weight [1-256]` where the value of weight is between the
   two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo the three
   first steps.
 
-* Now, change your HAProxy configuration file to remove the weight
-  (for the moment) and change the balancing strategy. Use the `first`
-  strategy. Reset the web apps to have no delay. Clear the JMeter
-  results.
+6. Now, redo all the 5 previous questions with the cookies cleared between two requests. You do not need to provide screenshots or deep explanations. We expect just one or two setence to summarize your observations of the behavior with/without cookies and the 0/250/2500 ms delays.
 
-* Do a JMeter run and explain what is happening.
+### Task 5: Balancing strategies
 
-* Set a delay of 250 milliseconds on `s1` and redo the JMeter run. Explain what is happening.
+In this part of the lab, you will be less guided and you will have more opportunity to play and discover HAProxy. The main goal of this part is to play with various strategies and compare them together.
 
-* Once again, reset the JMeter results and make sure your
-  configuration file is ready to change for the `leastconn` strategy.
+We propose that you take the time to discover the different strategies in [HAProxy documentation](http://cbonte.github.io/haproxy-dconv/configuration-1.6.html#balance) and then pick two of them (can be round-robin but will be better to chose two others). Once you have chosen your strategies, you have to play with them (change configuration, use Jmeter script, do some experiments).
 
-* Do a new JMeter run with this strategy and explain what is
-  happening. Is there another strategy that looks similar? If yes,
-  which one?
+**Deliverables:**
 
-* Set the delay to `s1` at 250 milliseconds and redo a JMeter
-  run. What do you observe?
+1. Briefly explain the strategies you have chosen and why you have chosen them.
 
-* Redo all the previous step but configure JMeter to not clear the
-  cookies between each iterations. Compare:
-  
-  * `roundrobin` with/without cookies erased
-  * `first` with/without cookies erased
-  * `leastconn` with/without cookies erased
-  
-* Make a general comparison, in your own opinion, about the three
-  strategies used there. Read the documentation to understand the
-  differences.
+2. Provide evidences that you have played with the two strategies (configuration done, screenshots, ...)
 
-* Finally, for the purpose of this lab, which is the best strategy for
-  the case where both web application are 100% up and ready?
+3. Compare the both strategies and conclude which is the best for this lab (not necessary the best at all).
 
 #### References
 
