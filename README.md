@@ -17,7 +17,13 @@ progress in a lab report. Each task specifies one or more deliverables
 to be produced.  Collect all the deliverables in your lab report. Give
 the lab report a structure that mimics the structure of this document.
 
-**Remark**: Use the Task numbers and question numbers in reference in your report.
+**Remark**:
+
+  - Use the Task numbers and question numbers in reference in your report.
+
+  - The version of HAProxy used in this lab is `1.5`. When reading the doc, take care to read the doc corresponding to this version. Here is the link: http://cbonte.github.io/haproxy-dconv/configuration-1.5.html
+
+  - During the lab, you will have to modify and play a bit with the [haproxy.cfg](ha/config/haproxy.cfg) file. You will find all the reference links to the official documentation inlined in the file.
 
 ### Task 1: Install the tools
 
@@ -69,7 +75,7 @@ Bringing machine 'default' up with 'virtualbox' provider...
 ==> default: ************************  run haproxy  ************************
 ==> default: 5882839613b57e8b97737787a33678116237a80e0643cdd13fb34ac5f9e7d22b
 ```
-    
+
 There will be occasional error messages from `dpkg-preconfigure`,
 `debconf` or `invoke-rc.d`. You can safely ignore them.
 
@@ -104,7 +110,7 @@ following diagram:
 
 You can now navigate to the address of the load balancer
 <http://192.168.42.42> in your favorite browser. The load balancer
-forwards your HTTP request to one of the web app containers. 
+forwards your HTTP request to one of the web app containers.
 
 Both containers run the same simple test web app. It is modeled as a
 REST resource. To make this lab more "interesting" the app uses
@@ -151,7 +157,7 @@ Now it's time to play a bit with what we did until now.
 
 Open JMeter and then open the script `tester.jmx` present in the root
 folder of the project and follow the instructions given in the
-following screenshot (Click on the image and then on RAW button to see the picture in full size. Usefull to read the text):
+following screenshot (Click on the image and then on RAW button to see the picture in full size. Useful to read the text):
 
 ![JMeter](assets/img/jmeter.png)
 
@@ -164,7 +170,7 @@ The JMeter test plan is set up in the following way:
   back in the HTTP request any cookies received in previous responses.
 
 * The server tag is extracted from the HTTP response and used for two
-  counters, CS1 and CS2, that are incremented each time the reponse
+  counters, CS1 and CS2, that are incremented each time the response
   came from web app S1 or S2, respectively.
 
 * The Summary Report shows the counters ("S1 reached" / "S2 reached")
@@ -177,7 +183,7 @@ The JMeter test plan is set up in the following way:
   URL <http://192.168.42.42> in your browser. Add screenshots to
   complement your explanations. We expect that you take a deeper a
   look at session management.
-  
+
 2. Explain what should be the correct behavior of the load balancer for
   session management.
 
@@ -186,7 +192,7 @@ The JMeter test plan is set up in the following way:
   want to see what is happening with the cookie. We want to see the
   sequence of messages exchanged (1) between the browser and HAProxy
   and (2) between HAProxy and the nodes S1 and S2. Here is an example:
-  
+
   ![Sequence diagram for part 1](assets/img/seq-diag-1.png)
 
 4. Provide a screenshot of the summary report from JMeter.
@@ -196,7 +202,7 @@ The JMeter test plan is set up in the following way:
   ```bash
   $ docker stop s1
   ```
-  
+
   Clear the results in JMeter and re-run the test plan. Explain what
   is happening when only one node remains active. Provide another
   sequence diagram using the same model as the previous one.
@@ -210,7 +216,7 @@ this task your job is to fix the configuration of HAProxy to enable
 sticky session management.
 
 For that, you will have to play with docker a little bit more. You
-might want to consult the file `Docker quick reference.md` for some
+might want to consult the file [Docker quick reference](Docker quick reference.md) for some
 useful commands and hints.
 
 **Deliverables:**
@@ -226,7 +232,7 @@ useful commands and hints.
   <http://192.168.42.42> in your browser. Add screenshots to
   complement your explanations. We expect that you take a deeper a
   look at session management.
-  
+
 4. Provide a sequence diagram to explain what is happening when one
   requests the URL for the first time and then refreshes the page. We
   want to see what is happening with the cookie. We want to see the
@@ -294,7 +300,7 @@ When all the infra is up and running, perform the following steps:
 ![Admin Stat view of HAProxy](assets/img/stats.png)
 
   You should be able to see the `s1` and `s2` nodes and their state.
-  
+
 For the next operations, you will use HAProxy's built-in command line
 to query its status and send commands to it. HAProxy provides the
 command line via a TCP socket so that a system administrator is able
@@ -421,10 +427,10 @@ concurrent users.
 
 *Remark*: In general, take a screenshot of the summary report in
  JMeter to explain what is happening.
- 
+
 **Deliverables:**
 
-*Remark*: Make sur you have the cookies are kept between two requests.
+*Remark*: Make sure you have the cookies are kept between two requests.
 
 1. Be sure the delay is of 0 milliseconds is set on `s1`. Do a run to have base data to compare with the next experiments.
 
@@ -439,7 +445,7 @@ concurrent users.
   that, add `weight [1-256]` where the value of weight is between the
   two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo a run with 250ms delay.
 
-6. Now, what happened when the cookies are cleared between each requests and the delay is set to 250ms ? We expect just one or two setence to summarize your observations of the behavior with/without cookies.
+6. Now, what happened when the cookies are cleared between each requests and the delay is set to 250ms ? We expect just one or two sentence to summarize your observations of the behavior with/without cookies.
 
 ### Task 5: Balancing strategies
 
@@ -497,6 +503,6 @@ git rm --cached -r .
 git reset --hard
 ```
 
-Then, you are ready to go. You can provision your Vagrant VM again and start to work pacefully.
+Then, you are ready to go. You can provision your Vagrant VM again and start to work peacefully.
 
-There is a link to deeper explanation and procedure about the ending lines writtent by GitHub: https://help.github.com/articles/dealing-with-line-endings/
+There is a link to deeper explanation and procedure about the ending lines written by GitHub: https://help.github.com/articles/dealing-with-line-endings/
