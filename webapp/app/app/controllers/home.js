@@ -1,5 +1,5 @@
 var
-  sleep = require('sleep'),
+  sleep = require('thread-sleep'),
   express = require('express'),
   router = express.Router(),
   _ = require('underscore');
@@ -13,7 +13,7 @@ module.exports = function (app) {
 router.get('/', function(req, res, next) {
   // To ensure a delay is applied to the request to force degradation of the performances.
   if (sleepTimeout > 0) {
-    sleep.usleep(sleepTimeout);
+    sleep(sleepTimeout);
   }
 
   // We initialize the view counter the first time a user is requesting the resource
@@ -31,7 +31,6 @@ router.get('/', function(req, res, next) {
     hello: 'world!',
     ip: process.env['SERVER_IP'],
     host: process.env['SERVER_NAME'],
-    tag: process.env['SERVER_TAG'],
     sessionViews: req.session.views,
     id: req.sessionID
   }).end();
@@ -39,7 +38,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/delay', function(req, res, next) {
   if (req.body.delay || req.body.delay == 0) {
-    sleepTimeout = req.body.delay * 1000;
+    sleepTimeout = req.body.delay;
     res.status(200).send({ message: 'New timeout of ' + req.body.delay + 'ms configured.' }).end();
   }
   else {

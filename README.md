@@ -112,6 +112,10 @@ You can now navigate to the address of the load balancer
 <http://192.168.42.42> in your favorite browser. The load balancer
 forwards your HTTP request to one of the web app containers.
 
+In the case the previous link does not work, you can access the load balancer
+with <http://localhost:8080>. If you need to use this address, you will have
+to adapt the laboratory to use this address.
+
 Both containers run the same simple test web app. It is modeled as a
 REST resource. To make this lab more "interesting" the app uses
 sessions. The app is written in Node.js and uses a cookie named
@@ -506,3 +510,18 @@ git reset --hard
 Then, you are ready to go. You can provision your Vagrant VM again and start to work peacefully.
 
 There is a link to deeper explanation and procedure about the ending lines written by GitHub: https://help.github.com/articles/dealing-with-line-endings/
+
+### Mac OS X - Sierra
+
+It appears that Vagrant is bundled with a version of CURL that does not work
+properly on Mac OS X Sierra.
+
+If you see an error message that tell you it is not possible to find the box,
+then you probably have the problem with CURL.
+
+You can do this to make Vagrant using the CURL installed with Sierra and not
+the bundled one.
+
+```
+mv /opt/vagrant/embedded/bin/curl /opt/vagrant/embedded/bin/curl.bak
+```
