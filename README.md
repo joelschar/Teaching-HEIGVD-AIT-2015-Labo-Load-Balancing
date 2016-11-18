@@ -253,11 +253,7 @@ useful commands and hints.
   <del>uncheck</del><ins>verify that</ins> the box `Clear cookies each iteration?`
   <ins>is unchecked</ins>.
 
-6. Provide a screenshot of JMeter's summary report. This time, is there
-  a difference with this run and the run of Task 1?
-
-  * Once again, update the JMeter script. Go in `Thread Group` and
-  update the `Number of threads`. Set the value to 2.
+  * Go in `Thread Group` and update the `Number of threads`. Set the value to 2.
 
 7. Provide a screenshot of JMeter's summary report. Give a short
   explanation of what the load balancer is doing.
