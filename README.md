@@ -180,22 +180,21 @@ The JMeter test plan is set up in the following way:
 * The Summary Report shows the counters ("S1 reached" / "S2 reached")
   and the total counts.
 
-
 **Deliverables:**
 
 1. Explain how the load balancer behaves when you open and refresh the
-  URL <http://192.168.42.42> in your browser. Add screenshots to
-  complement your explanations. We expect that you take a deeper a
-  look at session management.
+    URL <http://192.168.42.42> in your browser. Add screenshots to
+    complement your explanations. We expect that you take a deeper a
+    look at session management.
 
 2. Explain what should be the correct behavior of the load balancer for
-  session management.
+    session management.
 
 3. Provide a sequence diagram to explain what is happening when one
-  requests the URL for the first time and then refreshes the page. We
-  want to see what is happening with the cookie. We want to see the
-  sequence of messages exchanged (1) between the browser and HAProxy
-  and (2) between HAProxy and the nodes S1 and S2. Here is an example:
+    requests the URL for the first time and then refreshes the page. We
+    want to see what is happening with the cookie. We want to see the
+    sequence of messages exchanged (1) between the browser and HAProxy
+    and (2) between HAProxy and the nodes S1 and S2. Here is an example:
 
   ![Sequence diagram for part 1](assets/img/seq-diag-1.png)
 
@@ -230,33 +229,33 @@ useful commands and hints.
   * Choose one of the both stickiness approach for the next tasks.
 
 2. Provide the modified `haproxy.cfg` file with a short explanation of
-  the modifications you did to enable sticky session management.
+     the modifications you did to enable sticky session management.
 
 3. Explain what is the behavior when you open and refresh the URL
-  <http://192.168.42.42> in your browser. Add screenshots to
-  complement your explanations. We expect that you take a deeper a
-  look at session management.
+     <http://192.168.42.42> in your browser. Add screenshots to
+       complement your explanations. We expect that you take a deeper a
+       look at session management.
 
 4. Provide a sequence diagram to explain what is happening when one
-  requests the URL for the first time and then refreshes the page. We
-  want to see what is happening with the cookie. We want to see the
-  sequence of messages exchanged (1) between the browser and HAProxy
-  and (2) between HAProxy and the nodes S1 and S2. We also want to see
-  what is happening when a second browser is used.
+     requests the URL for the first time and then refreshes the page. We
+       want to see what is happening with the cookie. We want to see the
+       sequence of messages exchanged (1) between the browser and HAProxy
+       and (2) between HAProxy and the nodes S1 and S2. We also want to see
+       what is happening when a second browser is used.
 
 5. Provide a screenshot of JMeter's summary report. Is there a
-  difference with this run and the run of Task 1?
+     difference with this run and the run of Task 1?
 
   * Clear the results in JMeter.
 
   * Now, update the JMeter script. Go in the HTTP Cookie Manager and
-  <del>uncheck</del><ins>verify that</ins> the box `Clear cookies each iteration?`
-  <ins>is unchecked</ins>.
+    <del>uncheck</del><ins>verify that</ins> the box `Clear cookies each iteration?`
+    <ins>is unchecked</ins>.
 
   * Go in `Thread Group` and update the `Number of threads`. Set the value to 2.
 
 7. Provide a screenshot of JMeter's summary report. Give a short
-  explanation of what the load balancer is doing.
+    explanation of what the load balancer is doing.
 
 
 ### Task 3: Drain mode
@@ -365,31 +364,31 @@ admin stats interface (or also found in the config file).
 1. Take a screenshot of the Step 5 and tell us which node is answering.
 
 2. Based on your previous answer, set the node in DRAIN mode. Take a
-  screenshot of the HAProxy state page.
+    screenshot of the HAProxy state page.
 
 3. Refresh your browser and explain what is happening. Tell us if you
-  stay on the same node or not. If yes, why? If no, why?
+    stay on the same node or not. If yes, why? If no, why?
 
 4. Open another browser and open `http://192.168.42.42`. What is
-  happening?
+    happening?
 
 5. Clear the cookies on the new browser and repeat these two steps
-  multiple times. What is happening? Are you reaching the node in
-  DRAIN mode?
+    multiple times. What is happening? Are you reaching the node in
+    DRAIN mode?
 
 6. Reset the node in READY mode. Repeat the three previous steps and
-  explain what is happening. Provide a screenshot of HAProxy's stats
-  page.
+    explain what is happening. Provide a screenshot of HAProxy's stats
+    page.
 
 7. Finally, set the node in MAINT mode. Redo the three same steps and
-  explain what is happening. Provide a screenshot of HAProxy's stats
-  page.
+    explain what is happening. Provide a screenshot of HAProxy's stats
+    page.
 
 ### Task 4: Round robin in degraded mode.
 
 In this part, we will try to simulate a degraded mode based on the round-robin previously configured.
 
-To help expermimenting the balancing when an application started to behave strangely, the web application
+To help experimenting the balancing when an application started to behave strangely, the web application
 has a REST resource to configure a delay in the response. You can set
 an arbitrary delay in milliseconds. Once the delay is configured, the
 response will take the amount of time configured.
@@ -435,15 +434,15 @@ concurrent users.
 1. Be sure the delay is of 0 milliseconds is set on `s1`. Do a run to have base data to compare with the next experiments.
 
 2. Set a delay of 250 milliseconds on `s1`. Relaunch a run with the
-  JMeter script and explain what it is happening?
+    JMeter script and explain what it is happening?
 
 3. Set a delay of 2500 milliseconds on `s1`. Same than previous step.
 
 4. In the two previous steps, are there any error? Why?
 
 5. Update the HAProxy configuration to add a weight to your nodes. For
-  that, add `weight [1-256]` where the value of weight is between the
-  two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo a run with 250ms delay.
+    that, add `weight [1-256]` where the value of weight is between the
+    two values (inclusive). Set `s1` to 2 and `s2` to 1. Redo a run with 250ms delay.
 
 6. Now, what happened when the cookies are cleared between each requests and the delay is set to 250ms ? We expect just one or two sentence to summarize your observations of the behavior with/without cookies.
 

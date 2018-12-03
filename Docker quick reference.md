@@ -206,5 +206,5 @@ and you can do a `tail -f` on it.
 $ docker rm ha
 
 # If started
-£ docker rm -f ha
+$ docker rm -f ha
 ```
