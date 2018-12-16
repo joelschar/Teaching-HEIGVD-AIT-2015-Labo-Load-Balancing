@@ -7,21 +7,21 @@ Yann Lederrey et Joel Schär
 
 ## Introduction
 
-Dans ce laboratoire nous allons voir comment mettre en service un serveur de réparation de charge et comment celui-ci se comportent en fonction des différentes configuration possible.
+Dans ce laboratoire nous allons voir comment mettre en service un serveur de répartition de charge et comment celui-ci se comporte en fonction des différentes configuration possibles.
 Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la gestion des sessions et comment le proxy va gérer une grande quantité de connexion simultanées.
 
 ## Tâches
 
 ### 1: Installation des outils
 
-1. Une fois les utils installés et le serveur vagrant démarrer, il est possible d'accéder au serveur à l'adresse [](192.168.41.41). On retrouve à cette adresse un serveur qui nous répond avec payload JSON.
+1. Une fois les outils installés et le serveur vagrant démarré, il est possible d'accéder au serveur à l'adresse [](192.168.41.41). On retrouve à cette adresse un serveur qui nous répond avec un payload JSON.
    ![1543753252410](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543753252410.png)![1543753304091](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543753304091.png)
-   Dans les deux captures d'écran du payload on voit que la référence vers l'hôte change. Ce changement signifie qu'il y à un load balancing de type Round Robin qui est en place. 
+   Dans les deux captures d'écran du payload on voit que la référence vers l'hôte change. Ce changement signifie qu'il y a un load balancing de type Round Robin qui est en place. 
    Le proxy va donc rediriger les requêtes vers l'un puis vers l'autre serveur en alternance. On voit ceci grâce au host id et au tag qui reviennent une fois sur deux.
 
-   On voit que l'id de la session est différent entre les deux requêtes. Et si on fait plus de requêtes  on se rend compte qu'a chaque connexion une nouvelle session est crée. L'id de session et nouveau et le compteur reprend toujours à 1.
+   On voit que l'id de la session est différent entre les deux requêtes. Si on fait plus de requêtes on se rend compte qu'a chaque connexion une nouvelle session est crée. L'id de session est nouveau et le compteur reprend toujours à 1.
 
-2. Il faudrait que le load balancer renvoie un hôte de manière consistante vers le même serveur. Ainsi celui-ci aura toujours la même session avec le même session ID tout au long de la connexion. On pourrait alors voir le compteur de connexion croître à chaque requête et différent entre les sessions.
+2. Il faudrait que le load balancer renvoie un hôte de manière consistante vers le même serveur. Ainsi celui-ci aura toujours la même session avec le même session ID tout au long de la connexion. On pourrait alors voir le compteur de connexions croître à chaque requête et de manière différente selon les sessions.
 
 3. La configuration du serveur est faite en mode round-robin. 
 
@@ -29,7 +29,7 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
    - L'application défini un session ID (NodeSessionID) qu'elle donne au client avec la réponse.
    - Le client stocke le NodeSessionID.
    - Lors de la seconde requête il joint cet ID à la requête.
-   -  Le proxy ne sait pas quoi faire avec cette ID, il applique donc sa méthode de redirection round-robine. 
+   -  Le proxy ne sait pas quoi faire avec cet ID, il applique donc sa méthode de redirection round-robine. 
    - Le serveur "S2", reçoit la requête avec un session ID qu'il ne connait pas. Il vas donc créer une nouvelle session et redonner l'ID au client.
    - Le client reçoit un nouvelle ID et va donc remplacer celui qu'il a déjà.
      ![1544977614354](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544977614354.png)
@@ -37,32 +37,32 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
 
 4. ![1543756924874](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543756924874.png)
 
-   On voit dans cette capture d'écran que la répartition se fait bien de manière équitable entre les deux serveur et qu'il sont donc choisis par alternance (Round Robin).
+   On voit dans cette capture d'écran que la répartition se fait bien de manière équitable entre les deux serveurs et qu'il sont donc choisis par alternance (Round Robin).
 
 5. ![1543757531470](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/15437532524101.png)
 
-   On voit ici que les requête sont toutes envoyée vers l'hôte S2. §
+   On voit ici que les requêtes sont toutes envoyées vers l'hôte S2. §
 
    ![1543757679778](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543757679778.png)
 
    ![1543757658767](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543757658767.png)
 
-   En regardant de plus près les deux dernières réponses du serveur, on voit que celle-ci sont belle est bien redirigée vers le même hôte à chaque fois. De ce fait la session est toujours la même et le compteur de sessionViews c'est bien incrémenté le bon nombre de fois sur la même session.
+   En regardant de plus près les deux dernières réponses du serveur, on voit que celles-ci sont belle est bien redirigées vers le même hôte à chaque fois. De ce fait la session est toujours la même et le compteur de sessionViews c'est bien incrémenté le bon nombre de fois sur la même session.
    Le comportement ici est celui que l'on attend pour une session.
 
    ![1544978337038](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544978337038.png)
 
 ### 2: Persistance des sessions (sticky sessions)
 
-1. Ces deux valeurs sont des cookies qui permettent de distinguer des requêtes et d'en faire le suivi. Le SERVERID est géré par HAProxy alors que le NODESESSID est géré par le serveur Node. La différence entre les deux, est le producteur du cookie. Soit le proxy génère un cookie et l'attache à la trame pour en faire le suivit, soit c'est l'application qui génère un cookie et l'associe à le requête. Le proxy va dans ce second cas utiliser ce cookie déjà existant pour faire le suivi de la trame et y ajouter un préfixe qui sera nettoyé avant de transmettre la requête au serveur.
+1. Ces deux valeurs sont des cookies qui permettent de distinguer des requêtes et d'en faire le suivi. Le SERVERID est géré par HAProxy alors que le NODESESSID est géré par le serveur Node. La différence entre les deux, est le producteur du cookie. Soit le proxy génère un cookie et l'attache à la trame pour en faire le suivi, soit c'est l'application qui génère un cookie et l'associe à le requête. Le proxy va dans ce second cas utiliser ce cookie déjà existant pour faire le suivi de la trame et y ajouter un préfixe qui sera nettoyé avant de transmettre la requête au serveur.
 
 2. Nous avons choisi d'implémenter la version du cookie injecté par HAProxy.
 
    ![1543831088277](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543831088277.png)
 
-   La capture d'écran illustre les modification apportée au fichier `ha/config/haproxy.cfg`.
-   On indique ici à serveur proxy d'injecter un cookie `SERVERID`.
-   On dit ensuite sur la ligne du serveur que pour le serveur `s1` de définir le cookie avec `s1` afin de retrouver directement le serveur vers lequel diriger la trame. Idem Pour `s2`.
+   La capture d'écran illustre les modifications apportées au fichier `ha/config/haproxy.cfg`.
+   On indique ici au serveur proxy d'injecter un cookie `SERVERID`.
+   On dit ensuite sur la ligne du serveur `s1`, on défini le cookie avec `s1` afin de retrouver directement le serveur vers lequel diriger la trame. Idem Pour `s2`.
    (Il faut faire cette modification sur le fichier dans le répertoire de base, ensuite aller dans vagrant avec `vagrant ssh`  et lancer le script `/vagrant/reprovision.sh`  )
 
 3. Une fois la modification appliquée on voit que le navigateur garde sa session entre les requêtes et que le compteur d'accès augmente.
@@ -77,7 +77,7 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
 
    ![1543832108495](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543832108495.png)
 
-4. - L'ors de la première requête les serveurs proxy utilise la méthode round robin pour choisir un serveur. 
+4. - Lors de la première requête les serveurs proxy utilisent la méthode round robin pour choisir un serveur. 
 
    - Au retour de la réponse, le serveur va indiquer au client de set le cookie "ServerID" avec la valeur de la machine qui vient de traiter la requête. (ici le serveur S1)
 
@@ -136,7 +136,7 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
    ![1543841430975](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543841430975.png)
    ![1543841455471](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543841455471.png)
    ![1543841487598](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543841487598.png)
-   On voit aussi que les id de session sont nouveau à chaque fois. L'application considère donc chaque requête comme un nouvelle utilisateur car elle n'as aucun moyen de savoir que c'est le même utilisateur qui fait plusieurs fois la requête.
+   On voit aussi que les id de session sont nouveaux à chaque fois. L'application considère donc chaque requête comme un nouvelle utilisateur car elle n'as aucun moyen de savoir que c'est le même utilisateur qui fait plusieurs fois la requête.
 
 7. On va remettre le noeud en mode Ready:
    ![1543841722131](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543841722131.png)
@@ -181,7 +181,7 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
 
    On relance JMeter :
    ![1543845136070](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543845136070.png)
-   Le temps d'exécution pour le noeud S2 est sensiblement le même que lors de la mesure de référence alors que pour le noeud S1 le temps est beaucoup plus long. Cela car pour chaque requête le serveur va attendre 250 ms avant de répondre.
+   Le temps d'exécution pour le noeud S2 est sensiblement le même que lors de la mesure de référence alors que pour le noeud S1 le temps est beaucoup plus long. Cela car pour chaque requêtes le serveur va attendre 250 ms avant de répondre.
 
 3. On set le delay sur le noeud S1 à 2500 ms:
    ![1543846077840](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543846077840.png)
@@ -220,9 +220,9 @@ Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la g
 ### 5: Stratégies de load balancing
 
 1. - **first**: 
-     permet de n'utiliser qu'un serveur pour autant que la charge ne dépasse pas un nombre de connexion supérieur a *maxconn*. Ce système me parrait très intéressent, car il permet de limiter la chager au maximum du fonctionnement normal d'un serveur. Elle permet aussi d'utiliser au maximum de ses capacités un serveur. 
-     Par exemple : sachant qu'un serveur support une chage de x connexion mais commence à montrer des faiblesses au dela, je ne vais utiliser qu'un serveur tant qu'il n'est pas surchargé. Ce serveur ne sera jamais solicité au dela de cette charge. L'utilisation des autres serveurs est à zéro tant que le premier n'est pas dépassé.
-     On pourrait envisager un cas de figure ou un gros serveur est utiliser pour gérer la charge habituelle et que des serveurs plus petites sont mis en appuis pour les moments de grosses influence. 
+     permet de n'utiliser qu'un serveur pour autant que la charge ne dépasse pas un nombre de connexion supérieur a *maxconn*. Ce système me parrait très intéressent, car il permet de limiter la charge au maximum du fonctionnement normal d'un serveur. Elle permet aussi d'utiliser un serveur au maximum de ses capacités. 
+     Par exemple : sachant qu'un serveur support une charge de x connexion mais commence à montrer des faiblesses au dela, je ne vais utiliser qu'un serveur tant qu'il n'est pas surchargé. Ce serveur ne sera jamais solicité au dela de cette charge. L'utilisation des autres serveurs est à zéro tant que le premier n'est pas dépassé.
+     On pourrait envisager un cas de figure ou un gros serveur est utilisé pour gérer la charge habituelle et que des serveurs plus petites sont mis en appuis pour les moments de grosses influences. 
    - **url_param**:
      Permet de spécifier le serveur qui doit être utilisé dans l'url directement. On va choisir dans une query string quel serveur doit être sélectionné par le serveur proxy.
      Ce mode de fonctionnement est très flexible et permet de choisir simplement par le client quel serveur il veut utiliser. On imagine que l'utilisateur lui même ne va pas faire la sélection, mais celle-ci pourrait être faite par le frontend selon des critères définis.
