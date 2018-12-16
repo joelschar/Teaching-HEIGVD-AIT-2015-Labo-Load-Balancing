@@ -1,8 +1,14 @@
 
 
+
 # AIT : Labo 3, Load Balancing
 
+Yann Lederrey et Joel Schär
+
 ## Introduction
+
+Dans ce laboratoire nous allons voir comment mettre en service un serveur de réparation de charge et comment celui-ci se comportent en fonction des différentes configuration possible.
+Nous allons voir qu'il existe plusieurs moyens mis a disposition pour faire la gestion des sessions et comment le proxy va gérer une grande quantité de connexion simultanées.
 
 ## Tâches
 
@@ -17,7 +23,17 @@
 
 2. Il faudrait que le load balancer renvoie un hôte de manière consistante vers le même serveur. Ainsi celui-ci aura toujours la même session avec le même session ID tout au long de la connexion. On pourrait alors voir le compteur de connexion croître à chaque requête et différent entre les sessions.
 
-3. **TODO**
+3. La configuration du serveur est faite en mode round-robin. 
+
+   - La première requête que reçoit le serveur proxy est redirigée vers le premier serveur de la liste.
+   - L'application défini un session ID (NodeSessionID) qu'elle donne au client avec la réponse.
+   - Le client stocke le NodeSessionID.
+   - Lors de la seconde requête il joint cet ID à la requête.
+   -  Le proxy ne sait pas quoi faire avec cette ID, il applique donc sa méthode de redirection round-robine. 
+   - Le serveur "S2", reçoit la requête avec un session ID qu'il ne connait pas. Il vas donc créer une nouvelle session et redonner l'ID au client.
+   - Le client reçoit un nouvelle ID et va donc remplacer celui qu'il a déjà.
+     ![1544977614354](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544977614354.png)
+     Les échangent s’enchaînent selon ce model mais le client ne pourra jamais garder une session constante et va sans cesse se retrouver avec un nouveau NodeSessionID.
 
 4. ![1543756924874](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543756924874.png)
 
@@ -34,7 +50,7 @@
    En regardant de plus près les deux dernières réponses du serveur, on voit que celle-ci sont belle est bien redirigée vers le même hôte à chaque fois. De ce fait la session est toujours la même et le compteur de sessionViews c'est bien incrémenté le bon nombre de fois sur la même session.
    Le comportement ici est celui que l'on attend pour une session.
 
-   **TODO** -> diagramme de séquence pour un seul serveur.
+   ![1544978337038](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544978337038.png)
 
 ### 2: Persistance des sessions (sticky sessions)
 
@@ -61,7 +77,21 @@
 
    ![1543832108495](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543832108495.png)
 
-4. **TODO** diagram
+4. - L'ors de la première requête les serveurs proxy utilise la méthode round robin pour choisir un serveur. 
+
+   - Au retour de la réponse, le serveur va indiquer au client de set le cookie "ServerID" avec la valeur de la machine qui vient de traiter la requête. (ici le serveur S1)
+
+   - Le client qui va faire une seconde requête va spécifier dans l'entête la valeur de ServerID qu'il dispose et ainsi permettre au serveur proxy de l'identifier.
+
+   - Le serveur proxy retire cet entête avant de passer la requête au serveur d'application
+
+   - Le serveur proxy va remettre l'entête au moment de retourner la requête au client. 
+
+
+
+     Cet entête ne transite donc qu'entre le serveur proxy et le client. Pour le serveur d'application cette gestion est entièrement transparente.
+
+     ![1544978630832](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544978630832.png)
 
 5. Avec JMeter on voit que toutes les requêtes sont bien transmises au même serveur.
    ![1543832220323](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1543832220323.png)
@@ -189,9 +219,58 @@
 
 ### 5: Stratégies de load balancing
 
-1. 1
-2. 1
-3. 1
+1. - **first**: 
+     permet de n'utiliser qu'un serveur pour autant que la charge ne dépasse pas un nombre de connexion supérieur a *maxconn*. Ce système me parrait très intéressent, car il permet de limiter la chager au maximum du fonctionnement normal d'un serveur. Elle permet aussi d'utiliser au maximum de ses capacités un serveur. 
+     Par exemple : sachant qu'un serveur support une chage de x connexion mais commence à montrer des faiblesses au dela, je ne vais utiliser qu'un serveur tant qu'il n'est pas surchargé. Ce serveur ne sera jamais solicité au dela de cette charge. L'utilisation des autres serveurs est à zéro tant que le premier n'est pas dépassé.
+     On pourrait envisager un cas de figure ou un gros serveur est utiliser pour gérer la charge habituelle et que des serveurs plus petites sont mis en appuis pour les moments de grosses influence. 
+   - **url_param**:
+     Permet de spécifier le serveur qui doit être utilisé dans l'url directement. On va choisir dans une query string quel serveur doit être sélectionné par le serveur proxy.
+     Ce mode de fonctionnement est très flexible et permet de choisir simplement par le client quel serveur il veut utiliser. On imagine que l'utilisateur lui même ne va pas faire la sélection, mais celle-ci pourrait être faite par le frontend selon des critères définis.
+     On pourrait envisager de faire la redirection différemment selon le genre de l'utilisateur. Tous les hommes sur un serveur et les femmes sur un autre.
+
+2. - **first**
+     Nous avons configuré le load balancing sur first et défini un nombre de connexion max à 20 pour le serveur S1 et à 5 pour le S2 on simule ainsi un serveur pouvant encaisser une grosse charge et un plus petit pouvant recevoir une charge moins importante.
+     ![1544965179856](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544965179856.png)
+
+     Le fonctionne de maxconn considère le nombre de connexion simultanée. Si celle-ci se font instantané mant on ne peut pas mettre ne déviance le fonctionnement. Nous avons donc défini des tâches qui prennent 100ms et ainsi atteindre le nombre de connexion maximum d'un serveur et simuler le débordement vers le serveur S2.
+     ![1544965389087](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544965389087.png)
+
+     On fait ensuite un test sans déborder le nombre d’utilisateurs maximum pour le serveur S1.
+     ![1544965573153](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544965573153.png)
+
+     On voit que seul le serveur S1 est solicité.
+
+     ![1544966008453](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544966008453.png)
+
+     On dépasse ensuite le nombre d'utilisateurs simultanés au delà du nombre maximum pour le serveur de base.
+     ![1544965813005](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544965813005.png)
+
+     On voit que seul les connexions débordant la charge max du serveur S1 est dirigée vers le serveur secondaire.
+     ![1544966241165](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544966241165.png)
+
+   - **url_param**:
+
+     On va configurer le mode balancing en *url_param* , et on désactive le sticky session. De cette manière on pourra choisir quel serveur utiliser indépendamment.
+     ![1544974931915](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544974931915.png)
+
+     Une fois configuré on peut sélectionner le serveur à utiliser dans l'url directement sous forme d'une query string. Ici on commence par accéder au server s1.
+     ![1544975120638](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544975120638.png)
+
+     ![1544975142945](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544975142945.png)
+     On voit que seul le serveur S1 est solicité et que la session est conservée.
+     ![1544975547303](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544975547303.png)
+     En indiquant le serveur "S2", on passe directement vers celui-ci.
+     ![1544975619007](/home/joel/Switchdrive/HEIG/S-5/AIT/Labos/labo-03-Load-Balancing/img/1544975619007.png)
+     Une nouvelle session est créée et celle-ci est conservée d'une requête à l'autre.
+
+3. Les deux méthodes ont leur points fort et doivent être utilisées dans des circonstances différentes. L'utilisation de l'url peut s'avérer utilise, mais ne fait pas sens dans le cas ou le frontend n'a pas été construit de manière à faire la répartition de charge.
+   Quand au modèle le concentrant sur un seul serveur avant de commencer l'utilisation du suivant, va permettre d'utiliser un seul serveur à son plein potentiel avant d'utiliser le suivant. Ceci ne permet cependant pas d'optimiser l'utilisation des ressources en répartissant la charge sur toutes les machines disponible.
+   Ces modes d'utilisation sont très particulier et le serveur se doit de les implémenter afin de couvrir les cas d'utilisation dans lesquels il fait sens de les mettre en service. Il faut cependant garder en tête que ce ne sont de loin pas les comportements que l'on attend en général d'un serveur proxy de répartition de charge.
+   Pour le laboratoire actuel la méthode qui fait le plus sens d'utiliser est la méthode **first**. Cela car c'est le modèle qui permet de faire la répartition de charge du côté serveur. Le but du laboratoire étant de voir quel comportement aura la réparation automatique en fonction de la monté en charge simulée sur l'infrastructure. La manière utilisant l'url permettrait de créer des scripts de tests très flexible et modulable, mais cela n'entre pas dans le cadre de ce laboratoire.
 
 ## Conclusion
 
+Ce laboratoire permet de mettre en évidence les différents type de répartition de charge qui sont disponible et quel sont les besoins que pourrait avoir un service quant à la gestion des sessions.
+
+Nous avons illustrés ces comportements par des exemples pratiques et avons mis en évidence les cas de figure qui se prêtent à l'une ou l'autre des configurations.
+Un laboratoire très intéressent qui nous à permis de comprendre le fonctionnement d'un proxy sur le plan pratique et de voir comment la théorie se met en application.
